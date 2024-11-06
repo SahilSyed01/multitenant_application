@@ -18,3 +18,7 @@ type CreateManagerResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }
+
+type RemoveManagerRequest struct {
+	Username string `json:"username"`
+}

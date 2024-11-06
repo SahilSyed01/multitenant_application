@@ -2,7 +2,10 @@ module multitenant
 
 go 1.22.3
 
-require go.mongodb.org/mongo-driver v1.17.1
+require (
+	github.com/rs/cors v1.11.1
+	go.mongodb.org/mongo-driver v1.17.1
+)
 
 require (
 	github.com/golang/snappy v0.0.4 // indirect
