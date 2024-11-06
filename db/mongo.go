@@ -52,8 +52,7 @@ func AuthenticateUser(username, password string) (bool, string, error) {
 	return true, user.Tag, nil
 }
 
-func AddManager(username string, groupLimit int) (bool, string) {
-	// Get the MongoDB client and collection
+func AddManager(username, password string, groupLimit int) (bool, string) {
 	clientOptions := options.Client().ApplyURI(config.MongoURI)
 	client, err := mongo.Connect(context.TODO(), clientOptions)
 	if err != nil {
@@ -61,28 +60,38 @@ func AddManager(username string, groupLimit int) (bool, string) {
 	}
 	defer client.Disconnect(context.TODO())
 
-	// Select the database and collection
-	collection := client.Database("mydatabase").Collection("managers")
+	// Define collections
+	managerCollection := client.Database("mydatabase").Collection("managers")
+	userCollection := client.Database("mydatabase").Collection("users")
 
 	// Check if a manager with the same username already exists
 	var existingManager models.Manager
-	err = collection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&existingManager)
+	err = managerCollection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&existingManager)
 	if err == nil {
-		// A manager with the same username already exists
 		return false, fmt.Sprintf("manager with username '%s' already exists", username)
 	} else if err != mongo.ErrNoDocuments {
-		// An error occurred while querying
 		return false, fmt.Sprintf("error checking for existing manager: %v", err)
 	}
 
-	// Insert the manager into the collection
+	// Insert only the username and group limit into the managers collection
 	manager := models.Manager{
 		Username:   username,
 		GroupLimit: groupLimit,
 	}
-	_, err = collection.InsertOne(context.TODO(), manager)
+	_, err = managerCollection.InsertOne(context.TODO(), manager)
 	if err != nil {
 		return false, fmt.Sprintf("could not insert manager: %v", err)
+	}
+
+	// Insert username, password, and "manager" tag into the users collection
+	user := models.User{
+		Username: username,
+		Password: password,
+		Tag:      "manager",
+	}
+	_, err = userCollection.InsertOne(context.TODO(), user)
+	if err != nil {
+		return false, fmt.Sprintf("manager created, but could not add user: %v", err)
 	}
 
 	return true, "manager created successfully"

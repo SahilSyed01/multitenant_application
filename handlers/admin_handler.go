@@ -27,14 +27,13 @@ func CreateManagerHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Check if group limit is a positive integer
 	if request.GroupLimit <= 0 {
 		http.Error(w, "Group limit must be a positive integer", http.StatusBadRequest)
 		return
 	}
 
-	// Call AddManager to add the manager
-	success, message := db.AddManager(request.Username, request.GroupLimit)
+	// Call AddManager to add to both managers and users collections
+	success, message := db.AddManager(request.Username, request.Password, request.GroupLimit)
 
 	// Prepare the response
 	response := models.CreateManagerResponse{
