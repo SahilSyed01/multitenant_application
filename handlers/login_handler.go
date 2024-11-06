@@ -24,8 +24,8 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Authenticate the user using the provided credentials
-	isAuthenticated, err := db.AuthenticateUser(loginRequest.Username, loginRequest.Password)
+	// Authenticate the user using the provided credentials and fetch the user's tag
+	isAuthenticated, tag, err := db.AuthenticateUser(loginRequest.Username, loginRequest.Password)
 	if err != nil {
 		http.Error(w, fmt.Sprintf("Error during authentication: %v", err), http.StatusInternalServerError)
 		return
@@ -34,23 +34,60 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	// Prepare the response
 	var response models.LoginResponse
 	if isAuthenticated {
+		// Authentication succeeded, now route based on the tag
 		response = models.LoginResponse{
 			Success: true,
 			Message: "Login successful",
 		}
+
+		// Send the login success response
+		w.Header().Set("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, "Failed to send response", http.StatusInternalServerError)
+			return
+		}
+
+		// Route to the appropriate page based on the tag
+		switch tag {
+		case "admin":
+			// Route to admin page
+			//http.Redirect(w, r, "/admin-dashboard", http.StatusSeeOther)
+           // fmt.Print("got admin tag")
+			return
+		case "manager":
+			// Route to manager page
+			//http.Redirect(w, r, "/manager-dashboard", http.StatusSeeOther)
+			return
+		case "user":
+			// Route to user page
+			//http.Redirect(w, r, "/user-dashboard", http.StatusSeeOther)
+			return
+		default:
+			// If the tag is invalid, deny access
+			response = models.LoginResponse{
+				Success: false,
+				Message: "Invalid user tag",
+			}
+			// Send the error response
+			w.Header().Set("Content-Type", "application/json")
+			err := json.NewEncoder(w).Encode(response)
+			if err != nil {
+				http.Error(w, "Failed to send response", http.StatusInternalServerError)
+			}
+		}
 	} else {
+		// Invalid credentials
 		response = models.LoginResponse{
 			Success: false,
 			Message: "Invalid username or password",
 		}
-	}
-  
-	// Set response header to JSON
-	w.Header().Set("Content-Type", "application/json")
 
-	// Send the response
-	err = json.NewEncoder(w).Encode(response)
-	if err != nil {
-		http.Error(w, "Failed to send response", http.StatusInternalServerError)
+		// Send the error response
+		w.Header().Set("Content-Type", "application/json")
+		err = json.NewEncoder(w).Encode(response)
+		if err != nil {
+			http.Error(w, "Failed to send response", http.StatusInternalServerError)
+		}
 	}
 }

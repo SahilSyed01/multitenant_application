@@ -4,11 +4,13 @@ package models
 type User struct {
 	Username string `bson:"username"`
 	Password string `bson:"password"`
+	Tag      string `bson:"tag"`
 }
 
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Tag      string `bson:"tag"`
 }
 
 // LoginResponse represents the structure of the login response

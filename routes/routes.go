@@ -1,15 +1,18 @@
 package routes
 
 import (
-	"net/http"
-	"multitenant/handlers" // Ensure this import path is correct
+	"multitenant/handlers"
+
+	"github.com/gorilla/mux"
 )
 
-// InitializeRoutes sets up all the routes for the microservice
-func InitializeRoutes() *http.ServeMux {
-	mux := http.NewServeMux()
-	
-	// Authentication routes
-	mux.HandleFunc("/login", handlers.LoginHandler) // Correct handler reference here
-	return mux
+// InitializeRoutes initializes all the routes for the application
+func InitializeRoutes() *mux.Router {
+	router := mux.NewRouter()
+
+	// Define routes for login and other endpoints
+	router.HandleFunc("/login", handlers.LoginHandler).Methods("POST")
+    router.HandleFunc("/create-manager", handlers.CreateManagerHandler).Methods("POST")
+
+	return router
 }

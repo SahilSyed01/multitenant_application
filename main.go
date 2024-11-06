@@ -6,7 +6,7 @@ import (
     "net/http"
 
     "multitenant/db"
-	"multitenant/routes" 
+    "multitenant/routes"
 )
 
 func main() {
@@ -19,7 +19,6 @@ func main() {
 
     // Initialize routes
     router := routes.InitializeRoutes()
-	
     // Start server
     fmt.Println("Server running on port 8080")
     log.Fatal(http.ListenAndServe(":8080", router))
