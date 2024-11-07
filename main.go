@@ -7,9 +7,12 @@ import (
 	"multitenant/routes"
 	"net/http"
 	"github.com/rs/cors"
+	"multitenant/models"
 )
 
 func main() {
+
+	models.InitMongoDB()
 	// Initialize MongoDB connection
 	err := db.ConnectMongoDB()
 	if err != nil {
