@@ -6,13 +6,13 @@ import (
 	"multitenant/db"
 	"multitenant/routes"
 	"net/http"
+
 	"github.com/rs/cors"
-	"multitenant/models"
 )
 
 func main() {
 
-	models.InitMongoDB()
+	db.InitMongoDB()
 	// Initialize MongoDB connection
 	err := db.ConnectMongoDB()
 	if err != nil {
@@ -26,7 +26,7 @@ func main() {
 	// Setup CORS with the allowed origin for Angular
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:4200"}, // Allow requests from Angular
-		AllowedMethods: []string{"GET", "POST", "DELETE","PUT","OPTIONS"},
+		AllowedMethods: []string{"GET", "POST", "DELETE", "PUT", "OPTIONS"},
 		AllowedHeaders: []string{"Content-Type"},
 	})
 
