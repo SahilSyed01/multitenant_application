@@ -100,3 +100,27 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User removed from group successfully"))
 }
+
+// DeleteUserHandler handles the deletion of a user
+func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Username string `json:"username"`
+	}
+
+	// Decode the JSON request body to get the username
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil || input.Username == "" {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	// Call the DeleteUser function to delete the user
+	err = db.DeleteUser(input.Username)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("User deleted successfully"))
+}

@@ -29,7 +29,7 @@ func GetGroupsCollection() *mongo.Collection {
 }
 
 func GetUsersCollection() *mongo.Collection {
-	return Client.Database("mydatabase").Collection("users") // Added for users collection
+	return Client.Database("mydatabase").Collection("users") 
 }
 
 func DisconnectMongoDB() error {

@@ -7,14 +7,8 @@ import (
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
-//	"go.mongodb.org/mongo-driver/tag"
-	//"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// const (
-// 	databaseName   = "mydatabase"
-// 	usersCollection = "users"
-// )
 
 // Create user logic
 func CreateUser(username, password string) error {
@@ -107,5 +101,14 @@ func RemoveUserFromGroup(manager, groupName, username string) error {
 		return fmt.Errorf("error removing user from group: %v", err)
 	}
 
+	return nil
+}
+
+// DeleteUser deletes a user from the "users" collection
+func DeleteUser(username string) error {
+	_, err := models.GetUsersCollection().DeleteOne(context.Background(), bson.M{"username": username})
+	if err != nil {
+		return fmt.Errorf("error deleting user: %v", err)
+	}
 	return nil
 }
