@@ -18,6 +18,8 @@ func InitializeRoutes() *mux.Router {
 	router.HandleFunc("/remove-user", handlers.RemoveUserHandler).Methods("DELETE")
 	router.HandleFunc("/create-user", handlers.CreateUserHandler).Methods("POST")
 	router.HandleFunc("/delete-user", handlers.DeleteUserHandler).Methods("DELETE")
+    router.HandleFunc("/add-budget", handlers.AddBudgetHandler).Methods("POST")
+    router.HandleFunc("/list-groups", handlers.ListGroupsHandler).Methods("GET")
 
 	return router
 }

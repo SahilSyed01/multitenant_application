@@ -21,12 +21,11 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.CreateUser(input.Username, input.Password)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	response:= db.CreateUser(input.Username, input.Password)
+	// Send the response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
-
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User created successfully"))
 
@@ -57,10 +56,10 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Attempt to create the group
-	err = db.CreateGroup(input.Username, input.GroupName)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	response:= db.CreateGroup(input.Username, input.GroupName)
+	// Send the response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
 
 	// Success response
@@ -87,12 +86,11 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.AddUserToGroup(input.Username, input.GroupName, input.User)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	response:= db.AddUserToGroup(input.Username, input.GroupName, input.User)
+	// Send the response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
-
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User added to group successfully"))
 
@@ -116,10 +114,10 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err = db.RemoveUserFromGroup(input.Username, input.GroupName, input.User)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+	response:= db.RemoveUserFromGroup(input.Username, input.GroupName, input.User)
+	// Send the response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
 
 	w.WriteHeader(http.StatusOK)
@@ -145,16 +143,78 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call the DeleteUser function to delete the user
-	err = db.DeleteUser(input.Username)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+	response:= db.DeleteUser(input.Username)
+	// Send the response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
 
 	w.WriteHeader(http.StatusOK)
 	w.Write([]byte("User deleted successfully"))
 
 	w.Header().Set("Content-Type", "application/json")
+    w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+    w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+    w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+}
+
+func AddBudgetHandler(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		GroupName string  `json:"group_name"`
+		Budget    float64 `json:"budget"`
+	}
+
+	err := json.NewDecoder(r.Body).Decode(&input)
+	if err != nil {
+		http.Error(w, "Invalid input", http.StatusBadRequest)
+		return
+	}
+
+	// Validate input
+	if strings.TrimSpace(input.GroupName) == "" {
+		http.Error(w, "Group name cannot be empty or whitespace", http.StatusBadRequest)
+		return
+	}
+
+	if input.Budget <= 0 {
+		http.Error(w, "Budget must be greater than zero", http.StatusBadRequest)
+		return
+	}
+
+	// Call the AddBudget function
+	response:= db.AddBudget(input.GroupName, input.Budget)
+	// Send the response
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to send response", http.StatusInternalServerError)
+	}
+	// Success response
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("Budget added to group successfully"))
+
+	// Set CORS headers
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
+	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
+	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
+}
+
+func ListGroupsHandler(w http.ResponseWriter, r *http.Request) {
+    var input struct {
+        Username string `json:"username"`
+    }
+ 
+    err := json.NewDecoder(r.Body).Decode(&input)
+    if err != nil || input.Username == "" {
+        http.Error(w, "Invalid input", http.StatusBadRequest)
+        return
+    }
+ 
+    response:=db.ListGroupsByManager(input.Username)
+	if err := json.NewEncoder(w).Encode(response); err != nil {
+		http.Error(w, "Failed to send response", http.StatusInternalServerError)
+	}
+ 
+    w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
     w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
     w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
