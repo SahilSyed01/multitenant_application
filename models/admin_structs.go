@@ -14,7 +14,7 @@ type CreateManagerRequest struct {
 }
 
 // CreateManagerResponse represents the structure of the response after creating a manager
-type CreateManagerResponse struct {
+type ManagerResponse struct {
 	Success bool   `json:"success"`
 	Message string `json:"message"`
 }

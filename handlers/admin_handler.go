@@ -69,17 +69,7 @@ func RemoveManagerHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Call RemoveManager to remove the manager from both collections
-	success, message := db.RemoveManager(request.Username)
-
-	// Prepare the response
-	response := struct {
-		Success bool   `json:"success"`
-		Message string `json:"message"`
-	}{
-		Success: success,
-		Message: message,
-	}
-
+	response := db.RemoveManager(request.Username)
 	// Set response header to JSON
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
