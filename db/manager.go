@@ -19,7 +19,7 @@ func GetManagerCollection() *mongo.Collection {
 }
 
 func GetGroupsCollection() *mongo.Collection {
-	return Client.Database("groups").Collection("groupnames")
+	return Client.Database("mydatabase").Collection("groupnames")
 }
 
 func GetUsersCollection() *mongo.Collection {

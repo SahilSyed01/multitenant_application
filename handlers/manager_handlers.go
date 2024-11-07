@@ -27,7 +27,6 @@ func CreateUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User created successfully"))
 
 	w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -64,7 +63,6 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Success response
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Group created successfully"))
 
 	w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -92,7 +90,6 @@ func AddUserHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User added to group successfully"))
 
 	w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -121,7 +118,6 @@ func RemoveUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User removed from group successfully"))
 
 	w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -150,7 +146,6 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("User deleted successfully"))
 
 	w.Header().Set("Content-Type", "application/json")
     w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -189,7 +184,6 @@ func AddBudgetHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	// Success response
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte("Budget added to group successfully"))
 
 	// Set CORS headers
 	w.Header().Set("Content-Type", "application/json")
