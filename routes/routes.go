@@ -2,8 +2,6 @@ package routes
 
 import (
 	"multitenant/handlers"
-
-
 	"github.com/gorilla/mux"
 )
 
