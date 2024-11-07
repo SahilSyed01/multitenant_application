@@ -23,7 +23,7 @@ func main() {
 	// Setup CORS with the allowed origin for Angular
 	c := cors.New(cors.Options{
 		AllowedOrigins: []string{"http://localhost:4200"}, // Allow requests from Angular
-		AllowedMethods: []string{"GET", "POST", "OPTIONS"},
+		AllowedMethods: []string{"GET", "POST", "DELETE","PUT","OPTIONS"},
 		AllowedHeaders: []string{"Content-Type"},
 	})
 

@@ -14,7 +14,7 @@ import (
 // AddManager adds a new manager and user to the respective collections
 func AddManager(username, password string, groupLimit int) (models.CreateManagerResponse) {
 	clientOptions := options.Client().ApplyURI(config.MongoURI)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		// Return JSON formatted error
 		return models.CreateManagerResponse{
@@ -30,7 +30,7 @@ func AddManager(username, password string, groupLimit int) (models.CreateManager
 
 	// Check if a manager with the same username already exists
 	var existingManager models.Manager
-	err = managerCollection.FindOne(context.TODO(), bson.M{"username": username}).Decode(&existingManager)
+	err = managerCollection.FindOne(context.Background(), bson.M{"username": username}).Decode(&existingManager)
 	if err == nil {
 		// Manager with the same username exists
 		return models.CreateManagerResponse{
@@ -50,7 +50,7 @@ func AddManager(username, password string, groupLimit int) (models.CreateManager
 		Username:   username,
 		GroupLimit: groupLimit,
 	}
-	_, err = managerCollection.InsertOne(context.TODO(), manager)
+	_, err = managerCollection.InsertOne(context.Background(), manager)
 	if err != nil {
 		// Error inserting manager
 		return models.CreateManagerResponse{
@@ -65,7 +65,7 @@ func AddManager(username, password string, groupLimit int) (models.CreateManager
 		Password: password,
 		Tag:      "manager",
 	}
-	_, err = userCollection.InsertOne(context.TODO(), user)
+	_, err = userCollection.InsertOne(context.Background(), user)
 	if err != nil {
 		// Error inserting user
 		return models.CreateManagerResponse{
@@ -83,7 +83,7 @@ func AddManager(username, password string, groupLimit int) (models.CreateManager
 
 func RemoveManager(username string) (bool, string) {
 	clientOptions := options.Client().ApplyURI(config.MongoURI)
-	client, err := mongo.Connect(context.TODO(), clientOptions)
+	client, err := mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		return false, fmt.Sprintf("could not connect to MongoDB: %v", err)
 	}
@@ -103,13 +103,13 @@ func RemoveManager(username string) (bool, string) {
 	}
 
 	// Remove the manager from the managers collection
-	_, err = managerCollection.DeleteOne(context.TODO(), bson.M{"username": username})
+	_, err = managerCollection.DeleteOne(context.Background(), bson.M{"username": username})
 	if err != nil {
 		return false, fmt.Sprintf("could not remove manager: %v", err)
 	}
 
 	// Remove the user from the users collection (the user tag is "manager")
-	_, err = userCollection.DeleteOne(context.TODO(), bson.M{"username": username, "tag": "manager"})
+	_, err = userCollection.DeleteOne(context.Background(), bson.M{"username": username, "tag": "manager"})
 	if err != nil {
 		return false, fmt.Sprintf("could not remove user: %v", err)
 	}

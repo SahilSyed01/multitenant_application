@@ -14,7 +14,7 @@ func AuthenticateUser(username, password string) (bool, string, error) {
 
 	// Check if the user exists with the given username and password
 	var user models.User
-	err := collection.FindOne(context.TODO(), bson.M{"username": username, "password": password}).Decode(&user)
+	err := collection.FindOne(context.Background(), bson.M{"username": username, "password": password}).Decode(&user)
 	if err != nil {
 		// If the error is not nil, it might mean the user is not found
 		if err == mongo.ErrNoDocuments {

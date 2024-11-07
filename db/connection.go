@@ -14,18 +14,18 @@ var client *mongo.Client
 func ConnectMongoDB() error {
 	clientOptions := options.Client().ApplyURI(config.MongoURI)
 	var err error
-	client, err = mongo.Connect(context.TODO(), clientOptions)
+	client, err = mongo.Connect(context.Background(), clientOptions)
 	if err != nil {
 		return err
 	}
 
 	// Ping MongoDB to verify connection
-	return client.Ping(context.TODO(), nil)
+	return client.Ping(context.Background(), nil)
 }
 
 // DisconnectMongoDB closes the MongoDB connection
 func DisconnectMongoDB() {
 	if client != nil {
-		client.Disconnect(context.TODO())
+		client.Disconnect(context.Background())
 	}
 }
