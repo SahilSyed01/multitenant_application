@@ -19,7 +19,7 @@ func GetManagerCollection() *mongo.Collection {
 }
 
 func GetGroupsCollection() *mongo.Collection {
-	return Client.Database("mydatabase").Collection("groupnames")
+	return Client.Database("mydatabase").Collection("groups")
 }
 
 func GetUsersCollection() *mongo.Collection {
@@ -205,37 +205,6 @@ func DeleteUser(username string) models.UserResponse  {
 	}
 	return models.UserResponse {Message: "User deleted successfully"}
 }
-
-// AddBudget assigns a budget to a group in the "managers" collection
-func AddBudget(groupName string, budget float64) models.UserResponse  {
-	if budget <= 0 {
-		return models.UserResponse {
-			Message: "budget must be greater than zero",
-			Status:  "error",
-		}
-	}
-
-	filter := bson.M{"group_name": groupName}
-	update := bson.M{"$set": bson.M{"budget": budget}}
-
-	result, err := GetGroupsCollection().UpdateOne(context.Background(), filter, update)
-	if err != nil {
-		return models.UserResponse {
-			Message: fmt.Sprintf("error updating budget: %v", err),
-			Status:  "error",
-		}
-	}
-
-	if result.MatchedCount == 0 {
-		return models.UserResponse {
-			Message: fmt.Sprintf("group '%s' not found", groupName),
-			Status:  "error",
-		}
-	}
-
-	return models.UserResponse {Message: "Budget updated successfully"}
-}
-
 func ListGroupsByManager(manager string) models.UserResponse {
     filter := bson.M{"manager": manager}
     
@@ -277,5 +246,117 @@ func ListGroupsByManager(manager string) models.UserResponse {
         Message: "Groups retrieved successfully",
         Status:  "success",
         Data:    groups,
+    }
+}
+
+func AddBudget(manager, groupName string, budget float64) models.UserResponse {
+    if budget <= 0 {
+        return models.UserResponse{
+            Message: "budget must be greater than zero",
+            Status:  "error",
+        }
+    }
+
+    // Check if the group exists for the given manager
+    filter := bson.M{"manager": manager, "group_name": groupName}
+    var group models.Group
+    err := GetGroupsCollection().FindOne(context.Background(), filter).Decode(&group)
+    if err != nil {
+        if err == mongo.ErrNoDocuments {
+            return models.UserResponse{
+                Message: fmt.Sprintf("group '%s' not found for manager '%s'", groupName, manager),
+                Status:  "error",
+            }
+        }
+        return models.UserResponse{
+            Message: fmt.Sprintf("error finding group: %v", err),
+            Status:  "error",
+        }
+    }
+
+    // Check if the budget is already assigned to the group
+    if group.Budget > 0 {
+        return models.UserResponse{
+            Message: fmt.Sprintf("budget is already allocated for the group '%s'", groupName),
+            Status:  "error",
+        }
+    }
+
+    // Assign the new budget to the group
+    update := bson.M{"$set": bson.M{"budget": budget}}
+    result, err := GetGroupsCollection().UpdateOne(context.Background(), filter, update)
+    if err != nil {
+        return models.UserResponse{
+            Message: fmt.Sprintf("error updating budget: %v", err),
+            Status:  "error",
+        }
+    }
+
+    if result.MatchedCount == 0 {
+        return models.UserResponse{
+            Message: fmt.Sprintf("group '%s' not found for manager '%s'", groupName, manager),
+            Status:  "error",
+        }
+    }
+
+    return models.UserResponse{
+        Message: fmt.Sprintf("Budget successfully allocated to group '%s'", groupName),
+        Status:  "success",
+    }
+}
+
+func UpdateBudget(manager, groupName string, budget float64) models.UserResponse {
+    if budget <= 0 {
+        return models.UserResponse{
+            Message: "Budget must be greater than zero",
+            Status:  "error",
+        }
+    }
+
+    // Check if the group exists for the given manager
+    filter := bson.M{"manager": manager, "group_name": groupName}
+    var group models.Group
+    err := GetGroupsCollection().FindOne(context.Background(), filter).Decode(&group)
+    if err != nil {
+        if err == mongo.ErrNoDocuments {
+            return models.UserResponse{
+                Message: fmt.Sprintf("Group '%s' not found for manager '%s'", groupName, manager),
+                Status:  "error",
+            }
+        }
+        return models.UserResponse{
+            Message: fmt.Sprintf("Error finding group: %v", err),
+            Status:  "error",
+        }
+    }
+
+    // Check if the group already has a budget assigned
+    if group.Budget == 0 {
+        return models.UserResponse{
+            Message: fmt.Sprintf("No budget allocated for group '%s'. Cannot update budget.", groupName),
+            Status:  "error",
+        }
+    }
+
+    // Update the existing budget in the group
+    update := bson.M{"$set": bson.M{"budget": budget}}
+    result, err := GetGroupsCollection().UpdateOne(context.Background(), filter, update)
+    if err != nil {
+        return models.UserResponse{
+            Message: fmt.Sprintf("Error updating budget: %v", err),
+            Status:  "error",
+        }
+    }
+
+    if result.MatchedCount == 0 {
+        return models.UserResponse{
+            Message: fmt.Sprintf("Group '%s' not found for manager '%s'", groupName, manager),
+            Status:  "error",
+        }
+    }
+
+    return models.UserResponse{
+        Message: fmt.Sprintf("Budget successfully updated for group '%s'", groupName),
+        Status:  "success",
     }
 }

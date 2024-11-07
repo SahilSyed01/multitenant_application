@@ -2,9 +2,10 @@ package models
 
 // Structs for managers and groups
 type Group struct {
-	Manager   string   `bson:"manager"`
-	GroupName string   `bson:"group_name"`
-	Members   []string `bson:"members"`
+    Manager   string   `json:"manager" bson:"manager"`
+    GroupName string   `json:"group_name" bson:"group_name"`
+    Members   []string `json:"members" bson:"members"`
+    Budget    float64  `json:"budget" bson:"budget"` // Add Budget field here
 }
 // ManagerResponse standardizes the response structure
 type UserResponse struct {
