@@ -59,7 +59,6 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
-
 	// Success response
 	w.WriteHeader(http.StatusOK)
 
@@ -68,6 +67,7 @@ func CreateGroupHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
 	w.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 }
+
 
 // AddUserHandler adds an existing user to a group
 func AddUserHandler(w http.ResponseWriter, r *http.Request) {
@@ -129,23 +129,19 @@ func DeleteUserHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Username string `json:"username"`
 	}
-
 	// Decode the JSON request body to get the username
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil || input.Username == "" {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-
 	// Call the DeleteUser function to delete the user
 	response := db.DeleteUser(input.Username)
 	// Send the response
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
-
 	w.WriteHeader(http.StatusOK)
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
@@ -156,18 +152,15 @@ func ListGroupsHandler(w http.ResponseWriter, r *http.Request) {
 	var input struct {
 		Username string `json:"username"`
 	}
-
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil || input.Username == "" {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-
 	response := db.ListGroupsByManager(input.Username)
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE")
@@ -180,14 +173,12 @@ func AddBudgetHandler(w http.ResponseWriter, r *http.Request) {
 		GroupName string  `json:"group_name"`
 		Budget    float64 `json:"budget"`
 	}
-
 	// Decode request body
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-
 	// Validate input
 	if strings.TrimSpace(input.Manager) == "" || strings.TrimSpace(input.GroupName) == "" {
 		http.Error(w, "Manager and Group name cannot be empty or whitespace", http.StatusBadRequest)
@@ -198,10 +189,8 @@ func AddBudgetHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Budget must be greater than zero", http.StatusBadRequest)
 		return
 	}
-
 	// Call AddBudget function
 	response := db.AddBudget(input.Manager, input.GroupName, input.Budget)
-
 	// Send the response
 	w.Header().Set("Content-Type", "application/json")
 	if response.Status == "error" {
@@ -209,12 +198,9 @@ func AddBudgetHandler(w http.ResponseWriter, r *http.Request) {
 	} else {
 		w.WriteHeader(http.StatusOK)
 	}
-
 	if err := json.NewEncoder(w).Encode(response); err != nil {
 		http.Error(w, "Failed to send response", http.StatusInternalServerError)
 	}
-	
-	
 	// Set CORS headers
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
@@ -229,20 +215,17 @@ func UpdateBudgetHandler(w http.ResponseWriter, r *http.Request) {
 		GroupName string  `json:"group_name"`
 		Budget    float64 `json:"budget"`
 	}
-
 	// Decode request body
 	err := json.NewDecoder(r.Body).Decode(&input)
 	if err != nil {
 		http.Error(w, "Invalid input", http.StatusBadRequest)
 		return
 	}
-
 	// Validate input
 	if strings.TrimSpace(input.Manager) == "" || strings.TrimSpace(input.GroupName) == "" {
 		http.Error(w, "Manager and Group name cannot be empty or whitespace", http.StatusBadRequest)
 		return
 	}
-
 	if input.Budget <= 0 {
 		http.Error(w, "Budget must be greater than zero", http.StatusBadRequest)
 		return
@@ -250,7 +233,6 @@ func UpdateBudgetHandler(w http.ResponseWriter, r *http.Request) {
 
 	// Call UpdateBudget function
 	response := db.UpdateBudget(input.Manager, input.GroupName, input.Budget)
-
 	// Send the response
 	w.Header().Set("Content-Type", "application/json")
 	if response.Status == "error" {

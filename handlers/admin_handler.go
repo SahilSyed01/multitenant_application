@@ -32,10 +32,8 @@ func CreateManagerHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Group limit must be a positive integer", http.StatusBadRequest)
 		return
 	}
-
 	// Call AddManager to add the manager
 	response := db.AddManager(request.Username, request.Password, request.GroupLimit)
-
 	// Set response header to JSON
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("Access-Control-Allow-Origin", "http://localhost:4200")
